@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cours Express + Twig - Guide Complet</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.7; 
+            margin: 0; 
+            padding: 1rem; 
+            background: #f5f7fa; 
+            color: #333;
+        }
+        h1, h2, h3 { 
+            color: #2c3e50; 
+            margin-top: 1.5em;
+        }
+        h1 {
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            background-color: #eef7ff;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #2980b9;
+        }
+        section { 
+            margin-bottom: 2rem; 
+            padding: 1.5rem; 
+            background: #fff; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #3498db;
+        }
+        pre { 
+            background: #2d3748; 
+            color: #e2e8f0; 
+            padding: 1rem; 
+            overflow-x: auto; 
+            border-radius: 6px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin: 1rem 0;
+        }
+        code { 
+            color: #e83e8c; 
+            background: #f8f9fa; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-weight: 500;
+        }
+        pre code {
+            color: inherit;
+            background: transparent;
+            padding: 0;
+        }
+        ul, ol { 
+            margin-left: 1.5rem; 
+            margin-bottom: 1rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        .note {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fdf2e8;
+            border-left: 4px solid #e67e22;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .tip {
+            background: #e8f7ef;
+            border-left: 4px solid #27ae60;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .definition {
+            background: #f4ecf7;
+            border-left: 4px solid #8e44ad;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .exercise {
+            background: #fff8e6;
+            border-left: 4px solid #f1c40f;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Cours Express + Twig - Guide Complet pour Débutants</h1>
+
+<section>
+    <h2>1. Introduction à Twig - Qu'est-ce qu'un moteur de template?</h2>
+    
+    <div class="definition">
+        <h3>Qu'est-ce que Twig?</h3>
+        <p>Twig est un <strong>moteur de templates</strong> pour Node.js (et aussi pour PHP). Un moteur de template est un outil qui vous permet de créer des pages web dynamiques en séparant la logique métier (code) de la présentation (HTML).</p>
+    </div>
+    
+    <p>Imaginez que vous construisez une maison :</p>
+    <ul>
+        <li><strong>Les fondations et la structure</strong> = Le code JavaScript (Express)</li>
+        <li><strong>La décoration intérieure</strong> = Les templates Twig</li>
+    </ul>
+    
+    <p>Avec Twig, vous pouvez créer des pages web qui s'adaptent aux données que vous leur envoyez, sans mélanger votre code JavaScript avec votre HTML.</p>
+    
+    <div class="note">
+        <h4>Exemple concret :</h4>
+        <p>Sans Twig, vous devriez écrire du HTML directement dans votre code JavaScript :</p>
+        <pre><code>// Méthode sans Twig (à éviter)
+app.get('/', (req, res) => {
+    let html = '&lt;h1&gt;' + title + '&lt;/h1&gt;';
+    html += '&lt;ul&gt;';
+    items.forEach(item => {
+        html += '&lt;li&gt;' + item + '&lt;/li&gt;';
+    });
+    html += '&lt;/ul&gt;';
+    res.send(html);
+});</code></pre>
+        
+        <p>Avec Twig, vous séparez le HTML du code :</p>
+        <pre><code>// Avec Twig (recommandé)
+app.get('/', (req, res) => {
+    res.render('home.twig', { 
+        title: 'Mon site', 
+        items: ['item1', 'item2'] 
+    });
+});</code></pre>
+    </div>
+    
+    <h3>Avantages de Twig</h3>
+    <ul>
+        <li><strong>Sécurité :</strong> Twig échappe automatiquement le HTML, ce qui empêche les attaques par injection de code.</li>
+        <li><strong>Lisibilité :</strong> La syntaxe est simple et claire, même pour les non-développeurs.</li>
+        <li><strong>Réutilisation :</strong> Vous pouvez créer des templates réutilisables (header, footer, etc.).</li>
+        <li><strong>Maintenance :</strong> Modifier l'apparence de votre site sans toucher au code.</li>
+    </ul>
+    
+    <div class="definition">
+        <h3>Qu'est-ce que le modèle MVC?</h3>
+        <p>MVC signifie <strong>Modèle-Vue-Contrôleur</strong>. C'est une façon d'organiser votre code en trois parties distinctes :</p>
+        <ul>
+            <li><strong>Modèle (Model) :</strong> Gère les données (base de données, fichiers, etc.)</li>
+            <li><strong>Vue (View) :</strong> Affiche les données (templates Twig)</li>
+            <li><strong>Contrôleur (Controller) :</strong> Fait le lien entre le modèle et la vue</li>
+        </ul>
+    </div>
+    
+    <p>Cette séparation rend votre code plus organisé et plus facile à maintenir.</p>
+</section>
+
+<section>
+    <h2>2. Installation et Configuration</h2>
+    
+    <h3>Prérequis</h3>
+    <p>Avant de commencer, assurez-vous d'avoir :</p>
+    <ul>
+        <li>Node.js installé sur votre machine</li>
+        <li>Un éditeur de code (VS Code, Sublime Text, etc.)</li>
+        <li>Un terminal (invite de commandes)</li>
+    </ul>
+    
+    <h3>Étape 1 : Créer un nouveau projet</h3>
+    <pre><code>mkdir mon-projet-express-twig
+cd mon-projet-express-twig</code></pre>
+    
+    <h3>Étape 2 : Initialiser le projet avec npm</h3>
+    <pre><code>npm init -y</code></pre>
+    <p>Cette commande crée un fichier <code>package.json</code> qui contient les informations sur votre projet.</p>
+    
+    <h3>Étape 3 : Installer Express et Twig</h3>
+    <pre><code>npm install express twig</code></pre>
+    
+    <div class="note">
+        <h4>Que font ces packages?</h4>
+        <ul>
+            <li><strong>Express :</strong> Framework web pour Node.js qui facilite la création de serveurs web</li>
+            <li><strong>Twig :</strong> Moteur de templates qui nous permet de créer des pages HTML dynamiques</li>
+        </ul>
+    </div>
+    
+    <h3>Étape 4 : Configurer les modules ESM</h3>
+    <p>Dans votre fichier <code>package.json</code>, ajoutez cette ligne :</p>
+    <pre><code>{
+  "name": "mon-projet-express-twig",
+  "version": "1.0.0",
+  "type": "module",
+  // ... le reste de votre configuration
+}</code></pre>
+    
+    <div class="warning">
+        <p><strong>Attention :</strong> La ligne <code>"type": "module"</code> est importante car elle permet d'utiliser la syntaxe moderne <code>import/export</code> au lieu de <code>require/module.exports</code>.</p>
+    </div>
+</section>
+
+<section>
+    <h2>3. Structure de Projet Recommandée</h2>
+    
+    <p>Une bonne organisation de vos fichiers est essentielle pour maintenir votre projet à long terme. Voici la structure recommandée :</p>
+    
+    <pre><code>/mon-projet-express-twig
+ ├── server.mjs                 # Point d'entrée de l'application
+ ├── package.json               # Configuration du projet
+ ├── /app                       # Dossier principal de l'application
+ │    ├── /controllers          # Contrôleurs (logique des pages)
+ │    │    └── homeController.mjs
+ │    ├── /models               # Modèles (gestion des données)
+ │    │    └── itemModel.mjs
+ │    ├── /routes               # Routes (URLs de l'application)
+ │    │    └── homeRoutes.mjs
+ │    └── /views                # Templates Twig
+ │         ├── layout.twig      # Template de base
+ │         ├── home.twig        # Page d'accueil
+ │         └── partials/        # Templates réutilisables
+ │              ├── header.twig
+ │              └── footer.twig
+ └── /public                    # Fichiers statiques (CSS, images, JS)
+      ├── css/
+      │    └── style.css
+      ├── js/
+      └── images/</code></pre>
+    
+    <h3>Explication de chaque dossier :</h3>
+    
+    <table>
+        <tr>
+            <th>Dossier/Fichier</th>
+            <th>Rôle</th>
+            <th>Exemple de contenu</th>
+        </tr>
+        <tr>
+            <td><code>server.mjs</code></td>
+            <td>Point de départ de l'application</td>
+            <td>Configuration d'Express, démarrage du serveur</td>
+        </tr>
+        <tr>
+            <td><code>/app/controllers</code></td>
+            <td>Contrôleurs</td>
+            <td>Logique pour chaque page (que faire quand un utilisateur visite une URL)</td>
+        </tr>
+        <tr>
+            <td><code>/app/models</code></td>
+            <td>Modèles</td>
+            <td>Interaction avec la base de données, manipulation des données</td>
+        </tr>
+        <tr>
+            <td><code>/app/routes</code></td>
+            <td>Routes</td>
+            <td>Définition des URLs et association avec les contrôleurs</td>
+        </tr>
+        <tr>
+            <td><code>/app/views</code></td>
+            <td>Vues (Templates)</td>
+            <td>Fichiers Twig qui définissent l'apparence des pages</td>
+        </tr>
+        <tr>
+            <td><code>/public</code></td>
+            <td>Fichiers statiques</td>
+            <td>CSS, JavaScript, images accessibles directement par le navigateur</td>
+        </tr>
+    </table>
+    
+    <div class="tip">
+        <p><strong>Conseil :</strong> Cette structure suit le pattern MVC (Modèle-Vue-Contrôleur) qui est une pratique standard dans le développement web. Elle vous aidera à garder votre code organisé et maintenable.</p>
+    </div>
+</section>
+
+<section>
+    <h2>4. Configuration du Serveur Express</h2>
+    
+    <p>Le fichier <code>server.mjs</code> est le cœur de votre application. Il configure Express et Twig, et démarre le serveur.</p>
+    
+    <h3>Code complet avec explications détaillées :</h3>
+    
+    <pre><code>// Importation des modules nécessaires
+import express from 'express';
+import twig from 'twig';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import homeRoutes from './app/routes/homeRoutes.mjs';
+
+// Configuration des chemins de fichiers pour les modules ESM
+// (nécessaire car __dirname n'existe pas avec les modules ESM)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Création de l'application Express
+const app = express();
+const port = 3000;
+
+// Configuration de Twig comme moteur de template
+app.engine('twig', twig.__express);  // Dit à Express d'utiliser Twig
+app.set('view engine', 'twig');      // Définit l'extension par défaut des templates
+app.set('views', path.join(__dirname, 'app', 'views'));  // Dossier où sont les templates
+
+// Configuration du dossier des fichiers statiques (CSS, images, JS)
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Utilisation des routes
+app.use('/', homeRoutes);
+
+// Démarrage du serveur
+app.listen(port, () => {
+    console.log(`Serveur démarré sur http://localhost:${port}`);
+});</code></pre>
+
+    <h3>Explications détaillées :</h3>
+    
+    <div class="definition">
+        <h4>Importation des modules</h4>
+        <p>Avec <code>import ... from ...</code>, nous importons les fonctionnalités dont nous avons besoin :</p>
+        <ul>
+            <li><code>express</code> : Le framework web</li>
+            <li><code>twig</code> : Le moteur de templates</li>
+            <li><code>path</code> et <code>fileURLToPath</code> : Pour gérer les chemins de fichiers</li>
+            <li><code>homeRoutes</code> : Nos routes personnalisées</li>
+        </ul>
+    </div>
+    
+    <div class="definition">
+        <h4>Configuration des chemins</h4>
+        <p>Dans les modules ESM de Node.js, <code>__dirname</code> n'existe pas. Nous devons le recréer :</p>
+        <pre><code>const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);</code></pre>
+        <p>Cela nous donne le chemin du dossier où se trouve notre fichier <code>server.mjs</code>.</p>
+    </div>
+    
+    <div class="definition">
+        <h4>Configuration de Twig</h4>
+        <p>Ces trois lignes configurent Twig comme moteur de templates :</p>
+        <ul>
+            <li><code>app.engine('twig', twig.__express)</code> : Associe l'extension .twig au moteur Twig</li>
+            <li><code>app.set('view engine', 'twig')</code> : Définit Twig comme moteur par défaut</li>
+            <li><code>app.set('views', ...)</code> : Indique où trouver les templates Twig</li>
+        </ul>
+    </div>
+    
+    <div class="definition">
+        <h4>Fichiers statiques</h4>
+        <p><code>app.use('/public', express.static(...))</code> rend le dossier <code>/public</code> accessible directement via l'URL. Par exemple, <code>http://localhost:3000/public/css/style.css</code> servira le fichier CSS.</p>
+    </div>
+    
+    <div class="definition">
+        <h4>Routes</h4>
+        <p><code>app.use('/', homeRoutes)</code> indique à Express d'utiliser nos routes personnalisées pour toutes les URLs qui commencent par "/".</p>
+    </div>
+</section>
+
+<section>
+    <h2>5. Création des Routes</h2>
+    
+    <p>Les routes définissent comment votre application répond aux requêtes des utilisateurs sur différentes URLs.</p>
+    
+    <h3>Fichier : <code>app/routes/homeRoutes.mjs</code></h3>
+    
+    <pre><code>// Importation d'Express et du contrôleur
+import express from 'express';
+import { renderHome } from '../controllers/homeController.mjs';
+
+// Création d'un routeur Express
+const router = express.Router();
+
+// Définition de la route pour la page d'accueil
+// Quand un utilisateur visite '/', exécute la fonction renderHome
+router.get('/', renderHome);
+
+// Exportation du routeur pour l'utiliser dans server.mjs
+export default router;</code></pre>
+
+    <h3>Explications détaillées :</h3>
+    
+    <div class="definition">
+        <h4>Qu'est-ce qu'un routeur?</h4>
+        <p>Un routeur dans Express est comme un "aiguilleur" qui dirige les requêtes vers la bonne fonction en fonction de l'URL demandée.</p>
+    </div>
+    
+    <div class="definition">
+        <h4>Méthodes HTTP</h4>
+        <p>Les routes peuvent répondre à différentes méthodes HTTP :</p>
+        <ul>
+            <li><code>router.get()</code> : Pour récupérer des données (affichage de pages)</li>
+            <li><code>router.post()</code> : Pour envoyer des données (formulaires)</li>
+            <li><code>router.put()</code> : Pour mettre à jour des données</li>
+            <li><code>router.delete()</code> : Pour supprimer des données</li>
+        </ul>
+    </div>
+    
+    <div class="note">
+        <h4>Exemple de routes supplémentaires :</h4>
+        <pre><code>// Ajouter d'autres routes
+router.get('/about', renderAbout);        // Page "À propos"
+router.get('/contact', renderContact);    // Page "Contact"
+router.get('/products/:id', renderProduct); // Page produit avec ID dynamique</code></pre>
+    </div>
+    
+    <div class="tip">
+        <p><strong>Conseil :</strong> Gardez vos routes simples. Leur seul rôle devrait être de diriger les requêtes vers les bons contrôleurs. Toute la logique métier doit être dans les contrôleurs.</p>
+    </div>
+</section>
+
+<section>
+    <h2>6. Création des Contrôleurs</h2>
+    
+    <p>Les contrôleurs contiennent la logique de vos pages. Ils préparent les données et décident quelle vue afficher.</p>
+    
+    <h3>Fichier : <code>app/controllers/homeController.mjs</code></h3>
+    
+    <pre><code>// Importation du modèle (pour récupérer des données)
+import { getItems } from '../models/itemModel.mjs';
+
+// Fonction contrôleur pour la page d'accueil
+export function renderHome(req, res) {
+  // Préparation des données à envoyer à la vue
+  const data = {
+    title: 'Page d\'accueil',
+    user: { 
+      name: 'Alice', 
+      role: 'Admin' 
+    },
+    items: getItems(),  // Récupération des données depuis le modèle
+    currentDate: new Date().toLocaleDateString('fr-FR')
+  };
+  
+  // Rendu de la vue 'home.twig' avec les données
+  res.render('home.twig', data);
+}
+
+// Exemple d'un autre contrôleur
+export function renderAbout(req, res) {
+  const data = {
+    title: 'À propos de nous',
+    description: 'Nous sommes une entreprise innovante...'
+  };
+  res.render('about.twig', data);
+}</code></pre>
+
+    <h3>Explications détaillées :</h3>
+    
+    <div class="definition">
+        <h4>Structure d'un contrôleur</h4>
+        <p>Un contrôleur est une fonction qui reçoit deux paramètres :</p>
+        <ul>
+            <li><code>req</code> (request) : Contient les informations sur la requête (URL, paramètres, données de formulaire, etc.)</li>
+            <li><code>res</code> (response) : Permet d'envoyer une réponse au navigateur</li>
+        </ul>
+    </div>
+    
+    <div class="definition">
+        <h4>La méthode res.render()</h4>
+        <p><code>res.render('home.twig', data)</code> est la méthode qui :</p>
+        <ol>
+            <li>Prend le template <code>home.twig</code></li>
+            <li>Injecte les données dans le template</li>
+            <li>Génère le HTML final</li>
+            <li>Envoie le HTML au navigateur</li>
+        </ol>
+    </div>
+    
+    <div class="note">
+        <h4>Que peut contenir l'objet data?</h4>
+        <p>Vous pouvez envoyer n'importe quel type de données à votre template :</p>
+        <pre><code>const data = {
+  title: 'String (texte)',
+  count: 42,                    // Nombre
+  isAdmin: true,                // Booléen
+  user: { name: 'Alice' },      // Objet
+  items: ['a', 'b', 'c'],       // Tableau
+  currentDate: new Date(),      // Date
+  htmlContent: '&lt;b&gt;Texte en gras&lt;/b&gt;'  // HTML (attention à la sécurité!)
+};</code></pre>
+    </div>
+    
+    <div class="tip">
+        <p><strong>Conseil :</strong> Essayez de garder vos contrôleurs simples. S'ils deviennent trop complexes, déplacez une partie de la logique dans les modèles.</p>
+    </div>
+</section>
+
+<section>
+    <h2>7. Création des Modèles</h2>
+    
+    <p>Les modèles gèrent les données de votre application. Ils pourraient interagir avec une base de données, des API externes, ou simplement retourner des données statiques.</p>
+    
+    <h3>Fichier : <code>app/models/itemModel.mjs</code></h3>
+    
+    <pre><code>// Fonction qui retourne une liste d'éléments
+export function getItems() {
+  return [
+    { id: 1, label: 'Premier élément', price: 19.99 },
+    { id: 2, label: 'Second élément', price: 29.99 },
+    { id: 3, label: 'Troisième élément', price: 39.99 }
+  ];
+}
+
+// Fonction qui trouve un élément par son ID
+export function getItemById(id) {
+  const items = getItems();
+  return items.find(item => item.id === parseInt(id));
+}
+
+// Fonction qui simule un appel à une base de données (asynchrone)
+export async function getItemsFromDatabase() {
+  // Simulation d'un délai de base de données
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve([
+        { id: 1, name: 'Produit A', category: 'Électronique' },
+        { id: 2, name: 'Produit B', category: 'Vêtements' }
+      ]);
+    }, 100);
+  });
+}</code></pre>
+
+    <h3>Explications détaillées :</h3>
+    
+    <div class="definition">
+        <h4>Rôle des modèles</h4>
+        <p>Les modèles ont pour responsabilité :</p>
+        <ul>
+            <li>Récupérer des données (depuis une base de données, un fichier, une API)</li>
+            <li>Manipuler et transformer des données</li>
+            <li>Valider des données</li>
+            <li>Appliquer des règles métier</li>
+        </ul>
+    </div>
+    
+    <div class="note">
+        <h4>Dans un vrai projet :</h4>
+        <p>Dans une application réelle, vos modèles interagiraient avec une base de données :</p>
+        <pre><code>// Exemple avec une base de données MongoDB
+import { MongoClient } from 'mongodb';
+
+export async function getUsers() {
+  const client = new MongoClient('mongodb://localhost:27017');
+  await client.connect();
+  const users = await client.db('mydb').collection('users').find().toArray();
+  await client.close();
+  return users;
+}</code></pre>
+    </div>
+    
+    <div class="tip">
+        <p><strong>Conseil :</strong> Même si vous commencez avec des données statiques, structurez votre code comme si vous utilisiez une base de données. Cela facilitera la transition plus tard.</p>
+    </div>
+</section>
+
+<section>
+    <h2>8. Création des Vues avec Twig - Syntaxe de Base</h2>
+    
+    <p>Les vues Twig sont des fichiers qui mélangent HTML et syntaxe Twig pour créer des pages dynamiques.</p>
+    
+    <h3>Fichier : <code>app/views/home.twig</code></h3>
+    
+    <pre><code>{# home.twig - Template pour la page d'accueil #}
+
+{# Étendre le layout principal #}
+{% extends 'layout.twig' %}
+
+{# Définir le titre de la page #}
+{% block title %}{{ title }} - Mon Site{% endblock %}
+
+{# Définir le contenu principal de la page #}
+{% block content %}
+  &lt;h2&gt;Bienvenue {{ user.name }}!&lt;/h2&gt;
+  
+  {# Affichage conditionnel selon le rôle #}
+  {% if user.role == 'Admin' %}
+    &lt;p class="admin-notice"&gt;Vous avez des privilèges d'administrateur.&lt;/p&gt;
+  {% endif %}
+  
+  &lt;h3&gt;Liste des éléments ({{ items|length }})&lt;/h3&gt;
+  
+  {# Boucle pour afficher chaque élément #}
+  &lt;ul class="items-list"&gt;
+  {% for item in items %}
+    &lt;li&gt;
+      &lt;strong&gt;{{ item.label }}&lt;/strong&gt; - {{ item.price }} €
+      {# Lien vers la page de détail #}
+      &lt;a href="/product/{{ item.id }}"&gt;Voir détails&lt;/a&gt;
+    &lt;/li&gt;
+  {% else %}
+    {# Ce bloc s'affiche si la liste est vide #}
+    &lt;li&gt;Aucun élément à afficher&lt;/li&gt;
+  {% endfor %}
+  &lt;/ul&gt;
+  
+  {# Affichage de la date #}
+  &lt;p class="date"&gt;Page générée le {{ currentDate }}&lt;/p&gt;
+{% endblock %}</code></pre>
+
+    <h3>Syntaxe Twig détaillée :</h3>
+    
+    <div class="definition">
+        <h4>Commentaires</h4>
+        <p><code>{# ... #}</code> permet d'ajouter des commentaires qui n'apparaîtront pas dans le HTML final.</p>
+    </div>
+    
+    <div class="definition">
+        <h4>Échappement automatique</h4>
+        <p>Twig échappe automatiquement le HTML pour la sécurité :</p>
+        <pre><code>{# Sécurisé - le HTML sera affiché comme texte #}
+{{ "&lt;script&gt;alert('XSS')&lt;/script&gt;" }}
+
+{# Non sécurisé - le HTML sera interprété #}
+{{ "&lt;b&gt;Texte en gras&lt;/b&gt;"|raw }}</code></pre>
+        <p class="warning">Utilisez <code>|raw</code> avec prudence, seulement si vous faites confiance à la source des données!</p>
+    </div>
+    
+    <h3>Les boucles dans Twig</h3>
+    
+    <div class="definition">
+        <h4>Boucle for</h4>
+        <p>La boucle <code>for</code> permet d'itérer sur des tableaux ou objets :</p>
+        <pre><code>{# Boucle simple #}
+{% for user in users %}
+  &lt;div&gt;{{ user.name }}&lt;/div&gt;
+{% endfor %}
+
+{# Avec index #}
+{% for index, user in users %}
+  &lt;div&gt;{{ index }}: {{ user.name }}&lt;/div&gt;
+{% endfor %}
+
+{# Boucle avec condition else #}
+{% for product in products %}
+  &lt;div&gt;{{ product.name }}&lt;/div&gt;
+{% else %}
+  &lt;p&gt;Aucun produit trouvé&lt;/p&gt;
+{% endfor %}</code></pre>
+    </div>
+    
+    <h3>Les conditions dans Twig</h3>
+    
+    <div class="definition">
+        <h4>Structure if/elseif/else</h4>
+        <pre><code>{# Condition simple #}
+{% if user.isLoggedIn %}
+  &lt;p&gt;Bienvenue!&lt;/p&gt;
+{% endif %}
+
+{# Condition avec else #}
+{% if temperature > 30 %}
+  &lt;p&gt;Il fait chaud!&lt;/p&gt;
+{% else %}
+  &lt;p&gt;Il fait frais&lt;/p&gt;
+{% endif %}
+
+{# Conditions multiples #}
+{% if user.role == 'admin' or user.role == 'moderator' %}
+  &lt;button&gt;Modérer&lt;/button&gt;
+{% endif %}</code></pre>
+    </div>
+    
+    <h3>Filtres Twig courants</h3>
+    
+    <div class="definition">
+        <p>Les filtres transforment les variables :</p>
+        <pre><code>{{ "bonjour"|capitalize }}        {# → "Bonjour" #}
+{{ "TEXTE EN MAJUSCULES"|lower }} {# → "texte en majuscules" #}
+{{ "hello world"|title }}         {# → "Hello World" #}
+{{ items|length }}                {# → Nombre d'éléments #}
+{{ date|date('d/m/Y') }}          {# → Formatage de date #}
+{{ price|number_format(2, ',', ' ') }} {# → Formatage de nombre #}</code></pre>
+    </div>
+</section>
+
+<section>
+    <h2>9. Layout et Héritage de Templates</h2>
+    
+    <p>L'héritage de templates est l'une des fonctionnalités les plus puissantes de Twig. Elle vous permet de créer un layout de base et de l'étendre dans vos pages.</p>
+    
+    <h3>Fichier : <code>app/views/layout.twig</code> (Layout principal)</h3>
+    
+    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="fr"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;{% block title %}Mon Site Web{% endblock %}&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/public/css/style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;
+    {# Inclusion d'un template partiel #}
+    {% include 'partials/header.twig' %}
+  &lt;/header&gt;
+  
+  &lt;main class="container"&gt;
+    {# Le contenu spécifique à chaque page viendra ici #}
+    {% block content %}{% endblock %}
+  &lt;/main&gt;
+  
+  &lt;footer&gt;
+    {# Inclusion d'un autre template partiel #}
+    {% include 'partials/footer.twig' %}
+  &lt;/footer&gt;
+  
+  {# Block pour les scripts JavaScript spécifiques à certaines pages #}
+  {% block javascripts %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h3>Fichier : <code>app/views/partials/header.twig</code> (Partiel réutilisable)</h3>
+    
+    <pre><code>&lt;nav class="navbar"&gt;
+  &lt;div class="nav-brand"&gt;
+    &lt;a href="/"&gt;Mon Logo&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;ul class="nav-menu"&gt;
+    &lt;li&gt;&lt;a href="/"&gt;Accueil&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/about"&gt;À propos&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/contact"&gt;Contact&lt;/a&gt;&lt;/li&gt;
+    
+    {# Menu conditionnel selon la connexion #}
+    {% if user %}
+      &lt;li&gt;&lt;a href="/profile"&gt;Mon profil&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="/logout"&gt;Déconnexion&lt;/a&gt;&lt;/li&gt;
+    {% else %}
+      &lt;li&gt;&lt;a href="/login"&gt;Connexion&lt;/a&gt;&lt;/li&gt;
+    {% endif %}
+  &lt;/ul&gt;
+&lt;/nav&gt;</code></pre>
+
+    <h3>Explications détaillées :</h3>
+    
+    <div class="definition">
+        <h4>L'héritage avec {% extends %}</h4>
+        <p>La directive <code>{% extends 'layout.twig' %}</code> indique que le template actuel hérite du layout principal. Tous les blocks définis dans le layout peuvent être surchargés.</p>
+    </div>
+    
+    <div class="definition">
+        <h4>Les blocks</h4>
+        <p>Les blocks sont des sections remplaçables dans un template :</p>
+        <ul>
+            <li>Dans le layout : <code>{% block content %}{% endblock %}</code> définit un emplacement vide</li>
+            <li>Dans les pages enfants : <code>{% block content %}...mon contenu...{% endblock %}</code> remplit cet emplacement</li>
+        </ul>
+    </div>
+    
+    <div class="definition">
+        <h4>L'inclusion avec {% include %}</h4>
+        <p><code>{% include 'partials/header.twig' %}</code> insère le contenu d'un autre template à cet emplacement. C'est parfait pour les éléments réutilisables comme le header, footer, etc.</p>
+    </div>
+    
+    <div class="note">
+        <h4>Avantages de cette approche :</h4>
+        <ul>
+            <li><strong>Réutilisation :</strong> Un seul layout pour tout le site</li>
+            <li><strong>Maintenance :</strong> Modifiez le header une fois, il change sur toutes les pages</li>
+            <li><strong>Consistance :</strong> Toutes les pages ont la même structure de base</li>
+            <li><strong>Flexibilité :</strong> Chaque page peut personnaliser certaines sections</li>
+        </ul>
+    </div>
+    
+    <div class="tip">
+        <p><strong>Conseil :</strong> Créez des templates partiels pour tout élément réutilisable : formulaires, cartes de produits, messages d'alerte, etc.</p>
+    </div>
+</section>
+
+<section>
+    <h2>10. Exercices Pratiques</h2>
+    
+    <div class="exercise">
+        <h3>Exercice Simple : Ajouter un élément</h3>
+        <p><strong>Objectif :</strong> Modifier le contrôleur pour ajouter un nouvel élément et l'afficher dans la vue.</p>
+        
+        <h4>Étapes :</h4>
+        <ol>
+            <li>Ouvrez le fichier <code>homeController.mjs</code></li>
+            <li>Dans l'objet <code>data</code>, ajoutez un nouvel élément au tableau <code>items</code></li>
+            <li>Vérifiez que l'élément apparaît sur la page d'accueil</li>
+        </ol>
+        
+        <h4>Solution :</h4>
+        <pre><code>// Dans homeController.mjs
+const data = {
+  title: 'Page d\'accueil',
+  user: { name: 'Alice', role: 'Admin' },
+  items: [
+    'Article 1', 
+    'Article 2', 
+    'Article 3',
+    'Nouvel Article'  // ← Votre nouvel élément
+  ]
+};</code></pre>
+    </div>
+    
+    <div class="exercise">
+        <h3>Exercice Intermédiaire : Créer une page "À propos"</h3>
+        <p><strong>Objectif :</strong> Créer une route <code>/about</code> avec son contrôleur et sa vue.</p>
+        
+        <h4>Étapes :</h4>
+        <ol>
+            <li>Créez une nouvelle route dans <code>homeRoutes.mjs</code></li>
+            <li>Créez une fonction contrôleur <code>renderAbout</code> dans <code>homeController.mjs</code></li>
+            <li>Créez un template <code>about.twig</code> qui étend le layout</li>
+            <li>Testez en visitant <code>http://localhost:3000/about</code></li>
+        </ol>
+        
+        <h4>Solution :</h4>
+        <pre><code>// Dans homeRoutes.mjs
+router.get('/about', renderAbout);
+
+// Dans homeController.mjs
+export function renderAbout(req, res) {
+  const data = {
+    title: 'À propos',
+    team: [
+      { name: 'Alice', role: 'Développeuse' },
+      { name: 'Bob', role: 'Designer' }
+    ],
+    currentYear: new Date().getFullYear()
+  };
+  res.render('about.twig', data);
+}
+
+// Dans about.twig
+{% extends 'layout.twig' %}
+
+{% block content %}
+  &lt;h1&gt;Notre équipe&lt;/h1&gt;
+  {% for member in team %}
+    &lt;div class="team-member"&gt;
+      &lt;h3&gt;{{ member.name }}&lt;/h3&gt;
+      &lt;p&gt;{{ member.role }}&lt;/p&gt;
+    &lt;/div&gt;
+  {% endfor %}
+  &lt;p&gt;© {{ currentYear }} Mon Entreprise&lt;/p&gt;
+{% endblock %}</code></pre>
+    </div>
+    
+    <div class="exercise">
+        <h3>Exercice Avancé : Formulaire avec traitement POST</h3>
+        <p><strong>Objectif :</strong> Créer un formulaire pour ajouter des éléments avec une route POST.</p>
+        
+        <h4>Étapes :</h4>
+        <ol>
+            <li>Créez une route GET pour afficher le formulaire</li>
+            <li>Créez une route POST pour traiter le formulaire</li>
+            <li>Ajoutez le middleware <code>express.urlencoded()</code> pour parser les données du formulaire</li>
+            <li>Créez un template avec le formulaire</li>
+            <li>Redirigez l'utilisateur après soumission</li>
+        </ol>
+        
+        <h4>Solution :</h4>
+        <pre><code>// Dans server.mjs (ajouter avant les routes)
+app.use(express.urlencoded({ extended: true }));
+
+// Dans homeRoutes.mjs
+router.get('/add-item', showAddItemForm);
+router.post('/add-item', processAddItemForm);
+
+// Dans homeController.mjs
+// Données temporaires (dans un vrai projet, utiliser une base de données)
+let items = ['Article 1', 'Article 2'];
+
+export function showAddItemForm(req, res) {
+  res.render('add-item.twig', { 
+    title: 'Ajouter un élément',
+    items: items 
+  });
+}
+
+export function processAddItemForm(req, res) {
+  const newItem = req.body.itemName; // Donnée du formulaire
+  if (newItem) {
+    items.push(newItem);
+  }
+  // Redirection vers la page d'accueil
+  res.redirect('/');
+}
+
+// Dans add-item.twig
+{% extends 'layout.twig' %}
+
+{% block content %}
+  &lt;h1&gt;Ajouter un élément&lt;/h1&gt;
+  
+  &lt;form method="POST" action="/add-item"&gt;
+    &lt;div&gt;
+      &lt;label for="itemName"&gt;Nom de l'élément:&lt;/label&gt;
+      &lt;input type="text" id="itemName" name="itemName" required&gt;
+    &lt;/div&gt;
+    &lt;button type="submit"&gt;Ajouter&lt;/button&gt;
+  &lt;/form&gt;
+  
+  &lt;h2&gt;Éléments existants:&lt;/h2&gt;
+  &lt;ul&gt;
+    {% for item in items %}
+      &lt;li&gt;{{ item }}&lt;/li&gt;
+    {% endfor %}
+  &lt;/ul&gt;
+{% endblock %}</code></pre>
+    </div>
+</section>
+
+<section>
+    <h2>Conclusion</h2>
+    
+    <p>Félicitations! Vous avez maintenant une compréhension solide d'Express avec Twig. Vous savez :</p>
+    
+    <ul>
+        <li>Configurer un serveur Express avec Twig</li>
+        <li>Organiser votre code selon le pattern MVC</li>
+        <li>Créer des routes et des contrôleurs</li>
+        <li>Utiliser la syntaxe Twig pour créer des templates dynamiques</li>
+        <li>Implémenter l'héritage de templates pour une meilleure réutilisation</li>
+    </ul>
+    
+    <div class="tip">
+        <h3>Prochaines étapes pour approfondir :</h3>
+        <ul>
+            <li><strong>Base de données :</strong> Intégrer MongoDB ou MySQL à vos modèles</li>
+            <li><strong>Authentification :</strong> Ajouter un système de connexion utilisateur</li>
+            <li><strong>API REST :</strong> Créer une API pour votre application</li>
+            <li><strong>Déploiement :</strong> Mettre votre application en ligne avec Heroku ou DigitalOcean</li>
+        </ul>
+    </div>
+    
+    <p>Avec ces bases, vous êtes prêt à créer des applications web dynamiques et bien structurées avec Node.js, Express et Twig!</p>
+</section>
+
+</body>
+</html>
